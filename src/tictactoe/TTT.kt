@@ -76,14 +76,30 @@ class TTT(parent: Array<Array<String>>, depth: Int) {
     }
 
     fun getBestChild(): TTT {
-        val winningChildren = children.filter{it.getResult()!=Result.TIE}
-        children.forEach{ c-> c.print(false)}
-        println("WinningChildren size="+winningChildren.size)
+        val winningChild = getWinningChild()
+
+        println ("Winning Child: "+winningChild?.stringRepresentation)
+        if (winningChild != null) {
+            return winningChild
+        }
+
+        val childrenWhoDontLose = children.filter { c-> c.getWinningChild() == null}
+
+        if (childrenWhoDontLose == null) {
+            return children.get(0)
+        }
+
+        return childrenWhoDontLose.sortedBy { numXWinningChildren }.get(0)
+    }
+
+    fun getWinningChild(): TTT? {
+        val winningChildren = children.filter{c-> c.getResult()!=Result.TIE}
 
         if (!winningChildren.isEmpty()) {
             return winningChildren.get(0)
         }
-        return children.sortedBy { numXWinningChildren }.get(0)
+
+        return null
     }
 
     fun getResult(): Result {
@@ -155,8 +171,6 @@ class TTT(parent: Array<Array<String>>, depth: Int) {
     }
 
     fun findBoardFromString(boardString: String): TTT? {
-        println ("We have "+allBoards.size+" boards")
-        allBoards.keys.forEach({b-> println("Board name: "+b)})
         val ttt = allBoards.get(boardString)
         return ttt
     }
@@ -164,7 +178,7 @@ class TTT(parent: Array<Array<String>>, depth: Int) {
 
 
     fun print(recursive: Boolean) {
-        println("depth $depth # children $numXWinningChildren/$numOWinningChildren/$numTieChildren -----------------")
+        /*println("depth $depth # children $numXWinningChildren/$numOWinningChildren/$numTieChildren -----------------")
         println(stringRepresentation+"\n")
         println(getResult())
         for (line in board) {
@@ -172,9 +186,10 @@ class TTT(parent: Array<Array<String>>, depth: Int) {
                 print("$cell ")
             }
             println()
-        }
+        }*/
 
 
+        println (stringRepresentation+": "+getResult())
         if (recursive) {
             for (child in children) {
                 child.print(recursive)
